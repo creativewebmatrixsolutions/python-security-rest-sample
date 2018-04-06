@@ -49,16 +49,16 @@ By default, the top 5 alerts from each security API provider will be selected. B
 
 After you've selected your choices, click on **Get alerts**. A REST call will be sent to the Microsoft Graph, and a table with all the received alerts will be displayed below the form:
 
-![Alerts received](static/images/getAlerts.png)
+![Alerts received](static/images/getAlerts.PNG)
 
 In the next section you'll see a "Manage Alerts" form where you can update lifecycle properties for a specific alert - by alert ID.
 Once the alert is updated the metadata of the original alert is displayed above the updated alert.
 
-![Alerts updated](static/images/updateAlerts.png)
+![Alerts updated](static/images/updateAlerts.PNG)
 
 Finally, the app enables sending an email notification of the latest alert to be sent from the signed in user's email account that contains information about the alert including the alert ID that allows viewing the alert.
 
-![Alerts updated](static/images/email.png)
+![Alerts updated](static/images/email.PNG)
 
 This sample uses _delegated permissions_ to send mail on behalf of the currently authenticated user, identified as 'me' in Graph API calls. You can also send mail on behalf of other users, if you have administrator consent for the appropriate _application permissions_. See the [Microsoft Graph permissions reference](https://developer.microsoft.com/en-us/graph/docs/concepts/permissions_reference) for more information about Graph's permission model.
 
