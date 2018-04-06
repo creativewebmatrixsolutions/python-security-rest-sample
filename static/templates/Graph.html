@@ -1,0 +1,315 @@
+<!--  Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
+      See LICENSE in the source repository root for complete license information. -->
+
+{% extends "_Layout.html" %}
+{% block Body %}
+
+<h1>{{ Title }}</h1>
+<p>Click "Analyst logon" button to get started</p>
+
+<div class="row">
+    <div class="col-sm-2">
+        <button class="btn btn-default" id="get-my-email-address" onclick="window.location.href='/GetMyEmailAddress'">Analyst Logon</button>
+    </div>
+    <div class="col-sm-4">
+        {% if 'access_token' in session %}
+        <pre name="user-email-address">{{ session['email'] }}</pre>
+        {% else %}
+        <pre name="user-email-address"></pre>
+        {% endif %}
+    </div>
+</div>
+
+<hr>
+
+
+<form action="{{ url_for('get_alerts') }}" method="POST">
+    <div>
+        <h3>Select alerts to view</h3>
+        <div class="form-group">
+            <div class="col-sm-1">
+                Top X
+                <select id="SelectTop" name="Top" runat="server" value="{{ session.get('alertData').Top }}">
+                    <option value=1>1</option>
+                    <option value=2>2</option>
+                    <option value=5 selected="selected">5</option>
+                    <option value=10>10</option>
+                </select>
+            </div>
+            <div class="col-sm-3">
+                Provider
+                <select id="SelectProvider" name="Provider" runat="server" value="{{ session.get('alertData').Provider }}" selected="{{ session.get('alertData').Provider }}">
+                    <option value="All" selected="selected">All</option>
+                    <option value="AIP">AIP</option>
+                    <option value="ASC">Azure Security Center</option>
+                    <option value="IPC">Azure AD Identity Protection</option>
+                    <option value="Windows Defender ATP">Windows Defender ATP</option>
+                </select>
+            </div>
+              
+            <div class="col-sm-2">
+                Category
+                <select id="SelectCategory" name="Category" runat="server" value="{{ session.get('alertData').Category }}">
+                    <option value="All" selected="selected">All</option>
+                    <option value="Ransomware">Ransomware</option>
+                    <option value="Keylogger Trojan">Keylogger Trojan</option>
+                    <option value="Exploit">Exploit</option>
+                    <option value="Update Required">Update Required</option>
+                    <option value="RDP Bruteforce">RDP Bruteforce</option>
+                    <option value="Credential Leakage">Credential Leakage</option>
+                    <option value="Malware">Malware</option>
+                    <option value="Access Denied">Access Denied</option>
+                    <option value="Reconnaissance">Reconnaissance</option>
+                    <option value="Threat Intelligence">Threat Intelligence</option>
+                    <option value="Sensitive File Exfiltration">Sensitive File Exfiltration</option>
+                </select>
+            </div>
+            <div class="col-sm-1">
+                Status
+                <select id="SelectStatus" name="Status" runat="server" value="{{ session.get('alertData').Status }}">
+                    <option value="All" selected="selected">All</option>
+                    <option value="NewAlert">NewAlert</option>
+                    <option value="InProgress">InProgress</option>
+                    <option value="Resolved">Resolved</option>
+                </select>
+            </div>
+            <div class="col-sm-1">
+                Severity
+                <select id="SelectSeverity" name="Severity" runat="server" value="{{ session.get('alertData').Severity }}">
+                    <option value="All" selected="selected">All</option>
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                </select>
+            </div>
+            <div class="col-sm-2">
+                <input type="checkbox" id="AssignedToMe"
+                       name="AssignedToMe"
+                       value="AssignedToMe" /> Assigned to me
+            </div>
+        </div>
+        <br>
+        <br>
+        <div class="form-group">
+            <div class="col-sm-3">
+                Fully Qualified Domain Name (FQDN) <input name="HostFqdn" type="text" class="form-control" value="{{ session.get('alertData').HostFqdn }}" placeholder="Enter FQDN" />
+            </div>
+            <div class="col-sm-3">
+                User Principal Name (UPN) <input name="Upn" type="text" class="form-control" value="{{ session.get('alertData').Upn }}" placeholder="Enter UPN" />
+            </div>
+            <div class="col-sm-2">
+                <button class="btn btn-primary" id="get-alerts" ng-model="GetAlertsClicked"><b>Get alerts</b></button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<br>
+<br>
+<br />
+
+<br />
+
+{% if 'GetAlertResults' in ViewData %}
+<div class="panel panel-default">
+    <div class="panel-heading">Alert details</div>
+    <div class="panel-body">
+        REST query: <a href="https://developer.microsoft.com/en-us/graph/graph-explorer?request=security/{{ ViewData.get('QueryDetails') }}&method=GET&version={{ Config.ISG_VERSION }}&GraphUrl=https://graph.microsoft.com">'{{ Config.ISG_URL }}{{ ViewData.get('QueryDetails') }}'</a>
+        <br />
+        <br />
+        {% if ViewData.get('GetAlertResults') == 'Incorrect Tenant Account' %}
+        Please sign in using a *.onmicrosoft.com account to view the demo data.
+        {% elif ViewData.get('GetAlertResults').value %}
+
+        <table>
+            <tr>
+                <th><b>Title</b></th>
+                <th><b>Category</b></th>
+                <th><b>Severity</b></th>
+                <th><b>Status</b></th>
+                <th><b>Provider</b></th>
+                <th><b>AssignedTo</b></th>
+                <th><b>ID</b></th>
+            </tr>
+
+            {% for alert in ViewData.get('GetAlertResults').value %}
+            <tr>
+                <td>
+                    <a href="/DisplayAlert/{{ alert.id }}" target="_blank\">
+                        <div style="height:100%;width:100%">
+                            {{ alert.title }}
+                        </div>
+                    </a>
+                </td>
+                <td>{% if alert.category %} {{alert.category}} {% else %} {% endif %}</td>
+                <td>{% if alert.severity %} {{ alert.severity }} {% else %} {% endif %}</td>
+                <td>{{ alert.status }}</td>
+                <td>{{ alert.vendorInformation.provider }}</td>
+                <td>{% if alert.assignedTo %}{{ alert.assignedTo }} {% else %} {% endif %}</td>
+                <td>{{ alert.id }}</td>
+            </tr>
+            {% endfor %}
+
+        </table>
+        {% else %}
+        No matching alerts
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+
+<hr>
+
+
+<form action="{{ url_for('update_alert') }}" method="POST">
+    <div>
+        <h3>Manage Alerts</h3>
+        <div class="row">
+            <div class="col-sm-3">
+                Alert Id
+                <input name="AlertId" type="text" class="form-control" value="{{ session.get('UpdateAlertData').AlertId }}" placeholder="Enter alert ID" />
+            </div>
+            <div class="col-sm-1">
+                Status
+                <select id="SelectStatusToUpdate" name="SelectStatusToUpdate" runat="server" value="{{ session.get('UpdateAlertData').SelectStatusToUpdate }}">
+                    <option value="Unknown">Unknown</option>
+                    <option value="NewAlert">NewAlert</option>
+                    <option value="InProgress">InProgress</option>
+                    <option value="Resolved">Resolved</option>
+                </select>
+            </div>
+            <!--<div class="col-sm-1">
+                Severity
+                <select id="SelectSeverityToUpdate" name="SelectSeverityToUpdate" runat="server" value="{{ session.get('UpdateAlertData').SelectSeverityToUpdate }}">
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                </select>
+            </div>-->
+            <div class="col-sm-2">
+                Feedback
+                <select id="SelectFeedbackToUpdate" name="SelectFeedbackToUpdate" runat="server" value="{{ session.get('UpdateAlertData').SelectFeedbackToUpdate }}">
+                    <option value="Unknown">Unknown</option>
+                    <option value="TruePositive">TruePositive</option>
+                    <option value="FalsePositive">FalsePositive</option>
+                    <option value="TrueNegative">TrueNegative</option>
+                    <option value="FalseNegative">FalseNegative</option>
+                </select>
+            </div>
+            <div class="col-sm-2">
+                Comments
+                <!--<input name="Comments" type="text" class="form-control" value="{# session.get('UpdateAlertData').Comments #}" placeholder="Enter comments" />-->
+                <textarea rows="2" cols="25" name="Comments" placeholder="Enter comments">{{ session.get('UpdateAlertData').Comments }}</textarea>
+            </div>
+        </div>
+
+        <br />
+        <div class="row">
+            <div class="col-sm-2">
+                <button class="btn btn-primary" id="update-alerts"><b>Update alert</b></button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<br>
+
+{% if 'UpdateAlertResults' in ViewData or 'UpdateAlertError' in ViewData %}
+<div class="panel panel-default" ng-show="GetAlertsClicked">
+    <div class="panel-heading">Alert details</div>
+    <div class="panel-body">
+        {% if 'UpdateQueryDetails' in ViewData %}
+        {{ ViewData.UpdateQueryDetails }}
+        <br />
+        {{ ViewData.UpdateQueryBody }}
+        <br />
+        <br />
+        <b>Original Alert Details:</b>
+        <table>
+            <tr>
+                <th><b>Title</b></th>
+                <th><b>Category</b></th>
+                <th><b>Severity</b></th>
+                <th><b>Status</b></th>
+                <th><b>Feedback</b></th>
+                <th><b>Provider</b></th>
+                <th><b>AssignedTo</b></th>
+                <th><b>Comments</b></th>
+            </tr>
+            <tr>
+                <td>
+                    <a href="/DisplayAlert/{{ ViewData.OldAlert.id }}" target="_blank\">
+                        <div style="height:100%;width:100%">
+                            {{ ViewData.OldAlert.title }}
+                        </div>
+                    </a>
+                </td>
+                <td>{{ ViewData.OldAlert['category'] }}</td>
+                <td>{% if ViewData.OldAlert['severity'] %} {{ ViewData.OldAlert['severity'] }} {% else %} {% endif %}</td>
+                <td>{{ ViewData.OldAlert['status'] }}</td>
+                <td>{{ ViewData.OldAlert['feedback'] }}</td>
+                <td>{{ ViewData.OldAlert['vendorInformation'].provider }}</td>
+                <td>{% if ViewData.OldAlert['assignedTo'] %} {{ ViewData.OldAlert['assignedTo'] }} {% else %} {% endif %}</td>
+                <td>{{ ViewData.OldAlert['comments'] }}</td>
+            </tr>
+        </table>
+        <br />
+        <b>Updated Alert Details:</b>
+        <table>
+            <tr>
+                <th><b>Title</b></th>
+                <th><b>Category</b></th>
+                <th><b>Severity</b></th>
+                <th><b>Status</b></th>
+                <th><b>Feedback</b></th>
+                <th><b>Provider</b></th>
+                <th><b>AssignedTo</b></th>
+                <th><b>Comments</b></th>
+            </tr>
+            <tr>
+                <td>
+                    <a href="/DisplayAlert/{{ ViewData.UpdateAlertResults.id }}" target="_blank\">
+                        <div style="height:100%;width:100%">
+                            {{ ViewData.UpdateAlertResults.title }}
+                        </div>
+                    </a>
+                </td>
+                <td>{{ ViewData.UpdateAlertResults.category }}</td>
+                <td>{% if ViewData.UpdateAlertResults.severity %} {{ ViewData.UpdateAlertResults.severity }} {% endif %}</td>
+                <td>{{ ViewData.UpdateAlertResults.status }}</td>
+                <td>{{ ViewData.UpdateAlertResults.feedback }}</td>
+                <td>{{ ViewData.UpdateAlertResults.vendorInformation.provider }}</td>
+                <td>{% if ViewData.UpdateAlertResults.assignedTo %} {{ ViewData.UpdateAlertResults.assignedTo }} {% endif %}</td>
+                <td>{{ ViewData.UpdateAlertResults.comments }}</td>
+            </tr>
+        </table>
+        {% else %}
+        {{ ViewData.UpdateAlertError }}
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+<hr>
+
+<form action="{{ url_for('email_alert') }}" method="POST">
+    <div>
+        <h3>Send email notification for latest alert</h3>
+
+        <div class="row">
+
+            <div class="col-sm-5">
+                Recipients <input name="recipients" type="text" class="form-control" value="{% if 'EmailRecipients' in ViewData %}{{ ViewData['EmailRecipients'] }}{% elif session.get('email') %}{{ session.get('email') }}{% endif %}" placeholder="Enter recipients email addresses, seperated by semicolon" />
+                <!-- <label for="recipients">Recipient email addresses, separated by a semicolon</label>-->
+            </div>
+            <div class="col-sm-2">
+                <button class="btn btn-primary" id="send-email"><b>Send email</b></button>
+            </div>
+        </div>
+    </div>
+</form>
+{% if 'EmailResults' in ViewData %}
+{{ ViewData['EmailResults'] }}
+{% endif %}
+
+{% endblock %}
