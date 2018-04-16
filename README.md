@@ -6,7 +6,7 @@ Microsoft Graph provides REST APIs for integrating with Intelligent Security Gra
 
 | API                 | Endpoint                                   |      |
 | ------------------- | ------------------------------------------ | ---- |
-| Get Alerts          | /security/alerts                           | WIP  |
+| Get Alerts          | /security/alerts                           | [docs](https://developer.microsoft.com/en-us/graph/docs/api-reference/beta/resources/alert)  |
 | Get user profile    | /me                                        | [docs](https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/user_get) |
 | Send mail           | /me/microsoft.graph.sendMail               | [docs](https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/user_sendmail) |
 
