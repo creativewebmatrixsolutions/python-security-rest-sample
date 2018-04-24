@@ -44,7 +44,7 @@ Where APPLICATION_ID is the application ID and REDIRECT_URL is the Redirect URL 
 3. Choose **Sign in with Microsoft** and authenticate with a Microsoft *.onmicrosoft.com identity.
 
 A form that allows building a filtered alert query by selecting values from drop down menus:
-
+-
 By default, the top 5 alerts from each security API provider will be selected. But you can select to retrieve 1, 5, 10, or 20 alerts from each provider.
 
 After you've selected your choices, click on **Get alerts**. A REST call will be sent to the Microsoft Graph, and a table with all the received alerts will be displayed below the form:
@@ -68,7 +68,7 @@ These samples are open source, released under the [MIT License](https://github.c
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information, see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
-Your feedback is important to us. Connect with us on [Stack Overflow](https://stackoverflow.com/questions/tagged/microsoftgraph). Tag your questions with [MicrosoftGraph].
+Your feedback is important to us. Connect with us on [Stack Overflow](https://stackoverflow.com/questions/tagged/microsoft-graph-security). Tag your questions with [Microsoft-Graph-Security].
 
 ## Resources
 
