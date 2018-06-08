@@ -38,6 +38,10 @@ def homepage():
     if 'access_token' in flask.session:
         if 'email' not in flask.session or 'username' not in flask.session :
             return flask.redirect(flask.url_for('get_my_email_address'))
+        if 'SecurityEvents.Read.All' not in flask.session['scopes'] or 'SecurityEvents.ReadWrite.All' not in flask.session['scopes']:
+            return flask.render_template('Admin_consent.html', Title="Microsoft Security Graph API demo web application"
+                                 ,Year=datetime.date.today().strftime("%Y")
+                                 ,ViewData=VIEW_DATA, Config=config)
     return flask.render_template('Graph.html', Title="Microsoft Security Graph API demo web application"
                                  ,Year=datetime.date.today().strftime("%Y")
                                  ,ViewData=VIEW_DATA, Config=config)
@@ -53,11 +57,29 @@ def login():
 @APP.route('/login/authorized')
 def authorized():
     """Handler for the application's Redirect Uri."""
+    # redirected admin consent flow
+    if flask.request.args.get('error') :
+        if flask.request.args.get('error_subcode'):
+            error_description = flask.request.args.get('error_subcode')
+        else :
+            error_description = flask.request.args['error_description']
+        message = '<strong>Error:</strong> ' + flask.request.args['error'] + '</br> <strong>Reason:</strong> ' + error_description
+        flask.flash(message, category='danger')
+        return flask.redirect('/')
+    elif flask.request.args.get('admin_consent') :
+        message = '<strong>Success</strong> Tenant: ' + flask.request.args['tenant'] + ' has given this application admin consent.'
+        flask.flash(message, category='success')
+        flask.session.pop('access_token', None) 
+        VIEW_DATA.clear()
+        return flask.redirect('/')
+
+    # redirected from authentication
     if str(flask.session['state']) != str(flask.request.args['state']):
         raise Exception('state returned to redirect URL does not match!')
     response = MSGRAPH.authorized_response()
-    #print(response)
+    #print("authorized response : ", response)
     flask.session['access_token'] = response['access_token']
+    flask.session['scopes'] = response['scope'].split()
     return flask.redirect('/')
 
 @APP.route('/logout')

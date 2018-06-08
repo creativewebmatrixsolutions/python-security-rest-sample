@@ -34,6 +34,18 @@ See LICENSE in the source repository root for complete license information. -->
         </div>
         <div class="container body-content">
             <br />
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="alert alert-dismissible alert-{{ category }}" role="alert">
+                        <p>
+                            {{ message|safe }}
+                        </p>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
             {% block Body %}{% endblock %}
             <!--<p><button type="button" class="btn btn-success btn-lg" onclick="window.location.href='/login'">Connect</button></p>-->
 
