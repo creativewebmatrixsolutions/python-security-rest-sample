@@ -7,8 +7,8 @@ other secure storage mechanism.
 # Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
 # See LICENSE in the project root for license information.
 
-CLIENT_ID = 'ENTER_YOUR_CLIENT_ID'
-CLIENT_SECRET = 'ENTER_YOUR_SECRET'
+CLIENT_ID = 'a9f4be0d-878b-4ed1-a1c0-1acdce7902e5'
+CLIENT_SECRET = 'hhmD2968{lrquCQOBLS8)?='
 REDIRECT_URI = 'http://localhost:5000/login/authorized'
 
 # AUTHORITY_URL ending determines type of account that can be authenticated:

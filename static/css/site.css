@@ -85,4 +85,10 @@ th, td {
 .body-content {
     padding-left: 15px;
     padding-right: 15px;
+    overflow: auto;
+}
+.panel-body {
+    padding-left: 15px;
+    padding-right: 15px;
+    overflow: auto;
 }

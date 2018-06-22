@@ -72,7 +72,6 @@ def authorized():
         flask.session.pop('access_token', None) 
         VIEW_DATA.clear()
         return flask.redirect('/')
-
     # redirected from authentication
     if str(flask.session['state']) != str(flask.request.args['state']):
         raise Exception('state returned to redirect URL does not match!')
@@ -80,7 +79,17 @@ def authorized():
     #print("authorized response : ", response)
     flask.session['access_token'] = response['access_token']
     flask.session['scopes'] = response['scope'].split()
+    flask.session['providers'] = get_providers()
     return flask.redirect('/')
+
+def get_providers():
+    top_alerts = get_top_security_alert()
+    providers = []
+    print(top_alerts)
+    for alert in top_alerts.get('value'):
+        providers.append(alert.get("vendorInformation").get("provider"))
+    return providers
+
 
 @APP.route('/logout')
 def logout():
@@ -264,6 +273,7 @@ def update_alert():
                 properties_to_update["feedback"] = alert_data.get("SelectFeedbackToUpdate")
             if alert_data.get("Comments") != "":
                 properties_to_update["comments"] = alert_data.get("Comments")
+            properties_to_update["vendorInformation"] = old_alert.get("vendorInformation")
             # update the alert
             update_security_alert(alertId, properties_to_update)
             # make another call to graph to get the updated alert
