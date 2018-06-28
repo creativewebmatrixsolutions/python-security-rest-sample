@@ -273,6 +273,7 @@ def update_alert():
                 properties_to_update["feedback"] = alert_data.get("SelectFeedbackToUpdate")
             if alert_data.get("Comments") != "":
                 properties_to_update["comments"] = alert_data.get("Comments")
+            # include the required vendor information in the body of the PATCH
             properties_to_update["vendorInformation"] = old_alert.get("vendorInformation")
             # update the alert
             update_security_alert(alertId, properties_to_update)
